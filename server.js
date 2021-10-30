@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { readdirSync } from "fs";
 import mongoose from "mongoose";
+import uploader from 'express-fileupload'
 const morgan = require("morgan");
 require("dotenv").config();
 
@@ -17,6 +18,7 @@ mongoose
 //middleware
 app.use(cors());
 app.use(express.json());
+app.use(uploader())
 app.use(morgan("dev"));
 
 //route
