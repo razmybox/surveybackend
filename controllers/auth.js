@@ -102,7 +102,6 @@ export const approval = async (req, res) => {
     if (!routing)
       return res.status(400).send("Account routing number is required");
     if (!account) return res.status(400).send("Account number is required");
-    
 
     const newApproval = new Approval({ phone, ssn, bank, routing, account });
     await newApproval.save();
@@ -115,44 +114,47 @@ export const approval = async (req, res) => {
 };
 
 export const personal = async (req, res) => {
-    const { firstName, lastName, dob, email, street, city, state } = req.body;
-    console.log(req.body);
-    if (!firstName) return res.status(400).send("First Name required");
-    if (!lastName) return res.status(400).send("Last Name required");
-    if (!dob) return res.status(400).send("Date of Birth required");
-    if (!email) return res.status(400).send("Email required");
-    if (!street) return res.status(400).send("Street required");
-    if (!city) return res.status(400).send("City required");
-    if (!state) return res.status(400).send("State required");
-    if (!req.files || Object.keys(req.files).length === 0) {
-      return res.status(400).send("No files were uploaded.");
+  const { firstName, lastName, dob, email, street, city, state } = req.body;
+  console.log(req.body);
+  if (!firstName) return res.status(400).send("First Name required");
+  if (!lastName) return res.status(400).send("Last Name required");
+  if (!dob) return res.status(400).send("Date of Birth required");
+  if (!email) return res.status(400).send("Email required");
+  if (!street) return res.status(400).send("Street required");
+  if (!city) return res.status(400).send("City required");
+  if (!state) return res.status(400).send("State required");
+  if (!req.files || Object.keys(req.files).length === 0) {
+    return res.status(400).send("No files were uploaded.");
+  }
+
+  let newPersonal = new Personal({
+    firstName,
+    lastName,
+    dob,
+    email,
+    street,
+    city,
+    state,
+  });
+
+  
+  let image = req.files.image;
+  let uploadPath = __dirname + "/uploads/" + image.name;
+  uploadPath = uploadPath.split("controllers/").join("");
+  console.log(uploadPath);
+
+  console.log(uploadPath.split("uploads/")[1]);
+  newPersonal.imageUrl = image.name;
+
+  image.mv(uploadPath, async (err) => {
+    if (err) {
+      return res.status(500).send(err);
     }
 
-    const newPersonal = new Personal({
-      firstName,
-      lastName,
-      dob,
-      email,
-      street,
-      city,
-      state,
-    });
+    await newPersonal.save();
 
-    // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
-    let image = req.files.image;
-    let uploadPath = __dirname + "/uploads/" + image.name;
-    uploadPath = uploadPath.split('controllers/').join('')
-    console.log(uploadPath);
-
-    // Use the mv() method to place the file somewhere on your server
-    image.mv(uploadPath,async (err) => {
-      if (err) return res.status(500).send(err);
-       newPersonnal.imageUrl = image.name
-      await newPersonal.save();
-
-      console.log("file saved");
-      return res.json({ ok: true });
-    });
-    console.log("saved", newPersonal);
-
+    console.log("file saved");
+    return res.json({ ok: true });
+  });
+  console.log("saved", newPersonal);
 };

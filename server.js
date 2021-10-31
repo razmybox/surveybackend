@@ -21,8 +21,13 @@ app.use(express.json());
 app.use(uploader())
 app.use(morgan("dev"));
 
+
+
+
+
 //route
 readdirSync("./routes").map((r) => app.use("/api", require(`./routes/${r}`)));
+app.use('/static/storage/', express.static('uploads'))
 
 const port = process.env.PORT;
 
